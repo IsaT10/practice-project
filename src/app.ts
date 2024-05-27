@@ -1,8 +1,11 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import SutdentRouter from './modules/student/student.route';
+
+import globalErrorHandler from './middleware/globalErrorHandler';
+import httpStatus from 'http-status';
+import router from './routes';
+import { notFoundRoute } from './middleware/notFoundRoute';
 const app: Application = express();
-const port = 3000;
 
 app.use(express.json());
 app.use(cors());
@@ -13,13 +16,12 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // api routes
-app.use('/api/v1/students', SutdentRouter);
+app.use('/api/v1', router);
 
-app.all('*', (req, res) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server`,
-  });
-});
+// not found route
+app.all('*', notFoundRoute);
+
+// handle error globally
+app.use(globalErrorHandler);
 
 export default app;

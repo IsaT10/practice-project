@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
 import {
   StudentModel,
   TGuardian,
@@ -90,9 +89,18 @@ const LocalGuardianSchema = new Schema<TLocalGuardian>({
 });
 
 const StudentSchema = new Schema<TStudent, StudentModel>({
-  id: { type: String, required: [true, 'Student ID is required.'] },
+  id: {
+    type: String,
+    required: [true, 'Student ID is required.'],
+    unique: true,
+  },
   name: { type: UserNameSchema, required: [true, 'Name is required'] },
-  password: { type: String, required: [true, 'Password is required'] },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, 'User ID is required.'],
+    unique: true,
+    ref: 'User',
+  },
   gender: {
     type: String,
     enum: {
@@ -105,7 +113,7 @@ const StudentSchema = new Schema<TStudent, StudentModel>({
   dateOfBirth: { type: String, required: [true, 'Date of Birth is required.'] },
   email: {
     type: String,
-    required: [true, 'Please enter a valid email address.'],
+    required: [true, 'Email is required'],
     // validate: {
     //   validator: (value: string) => validator.isEmail(value),
     //   message: 'Provide a valid email.',
@@ -129,7 +137,7 @@ const StudentSchema = new Schema<TStudent, StudentModel>({
     type: String,
     required: [true, 'Present address is required.'],
   },
-  parmanentAddress: {
+  permanentAddress: {
     type: String,
     required: [true, 'Permanent address is required.'],
   },
@@ -142,11 +150,7 @@ const StudentSchema = new Schema<TStudent, StudentModel>({
     required: [true, 'Local guardian information is required.'],
   },
   profileImg: String,
-  isActive: {
-    type: String,
-    enum: ['active', 'inactive'],
-    default: 'active',
-  },
+
   isDelete: {
     type: Boolean,
     default: false,
@@ -166,20 +170,6 @@ StudentSchema.statics.isUserExists = async function (id: string) {
 //   const result = await Student.findOne({ id });
 //   return result;
 // };
-
-// pre save middleware hook will be work on save() and create() method
-StudentSchema.pre('save', async function (next) {
-  const user = this;
-
-  const hashPassword = await bcrypt.hash(
-    user.password,
-    Number(process.env.SALT_ROUNDS)
-  );
-
-  user.password = hashPassword;
-
-  next();
-});
 
 StudentSchema.pre('find', async function (next) {
   this.find({ isDelete: { $ne: true } });
