@@ -1,12 +1,11 @@
-import { createStudentIntoDB } from './user.services';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 
-const createStudent = catchAsync(async (req, res) => {
-  const { password, student: studentData } = req.body;
+const createAcademicSemester = catchAsync(async (req, res) => {
+  //   const { password, student: studentData } = req.body;
 
-  const newStudent = await createStudentIntoDB(password, studentData);
+  //   const newStudent = await createStudentIntoDB(password, studentData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -16,4 +15,4 @@ const createStudent = catchAsync(async (req, res) => {
   });
 });
 
-export { createStudent };
+export { createAcademicSemester };

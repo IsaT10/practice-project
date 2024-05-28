@@ -29,35 +29,36 @@ const LocalGuardianValidationSchema = z.object({
   address: z.string().min(1, "Local guardian's address is required."),
 });
 
-const StudentValidationSchema = z.object({
-  id: z.string().min(1, 'Student ID is required.'),
-  name: UserNameValidationSchema,
-  password: z.string().min(8, 'Password can not be less than 8 character'),
-  gender: z.enum(['male', 'female', 'other'], {
-    errorMap: () => ({
-      message:
-        "The gender field can only be one of the following: 'male', 'female', or 'other'.",
+const CreateStudentValidationSchema = z.object({
+  body: z.object({
+    password: z.string().min(8, 'Password can not be less than 8 character'),
+    student: z.object({
+      name: UserNameValidationSchema,
+      gender: z.enum(['male', 'female', 'other'], {
+        errorMap: () => ({
+          message:
+            "The gender field can only be one of the following: 'male', 'female', or 'other'.",
+        }),
+      }),
+      dateOfBirth: z.string().optional(),
+      email: z.string().email('Provide a valid email.'),
+      contactNo: z.string({ message: '' }),
+      emergencyContactNo: z
+        .string()
+        .min(1, 'Emergency contact number is required.'),
+      bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
+        errorMap: () => ({
+          message:
+            "The blood group can only be one of the following: 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', or 'O-'.",
+        }),
+      }),
+      presentAddress: z.string().min(1, 'Present address is required.'),
+      permanentAddress: z.string().min(1, 'Permanent address is required.'),
+      guardian: GuardianValidationSchema,
+      localGuardian: LocalGuardianValidationSchema,
+      profileImg: z.string().optional(),
     }),
   }),
-  dateOfBirth: z.string().min(1, 'Date of Birth is required.'),
-  email: z.string().email('Provide a valid email.'),
-  contactNo: z.string({ message: '' }),
-  emergencyContactNo: z
-    .string()
-    .min(1, 'Emergency contact number is required.'),
-  bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
-    errorMap: () => ({
-      message:
-        "The blood group can only be one of the following: 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', or 'O-'.",
-    }),
-  }),
-  presentAddress: z.string().min(1, 'Present address is required.'),
-  parmanentAddress: z.string().min(1, 'Permanent address is required.'),
-  guardian: GuardianValidationSchema,
-  localGuardian: LocalGuardianValidationSchema,
-  profileImg: z.string().optional(),
-  isActive: z.enum(['active', 'inactive']).default('active'),
-  isDelete: z.boolean().default(false),
 });
 
-export default StudentValidationSchema;
+export { CreateStudentValidationSchema };
