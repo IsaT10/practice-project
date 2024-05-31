@@ -31,7 +31,7 @@ const updateAcademicSemesterInDB = async (
     payload.code &&
     AcademicSemesterCodeNameMapper[payload.name] !== payload.code
   ) {
-    throw new Error('Invalid semester ');
+    throw new Error('Invalid semester code!');
   }
   const result = await AcademicSemester.findByIdAndUpdate(id, payload, {
     new: true,
