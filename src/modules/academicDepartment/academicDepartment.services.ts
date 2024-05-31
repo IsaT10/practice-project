@@ -1,36 +1,40 @@
-import { TAcademicFaculty } from './academicFaculty.interface';
-import { AcademicFaculty } from './academicFaculty.model';
+import { TAcademicDepartment } from './academicDepartment.interface';
+import { AcademicDepartment } from './academicDepartment.model';
 
-const createAcademicFacultyIntoDB = async (payload: TAcademicFaculty) => {
-  const result = await AcademicFaculty.create(payload);
+const createAcademicDepartmentIntoDB = async (payload: TAcademicDepartment) => {
+  const result = await AcademicDepartment.create(payload);
 
   return result;
 };
 
-const getAllAcademicFacultyFromDB = async () => {
-  const result = await AcademicFaculty.find();
+const getAllAcademicDepartmentFromDB = async () => {
+  const result = await AcademicDepartment.find().populate('academicFaculty');
   return result;
 };
 
-const getSingleAcademicFacultyFromDB = async (id: string) => {
-  const result = await AcademicFaculty.findById(id);
+const getSingleAcademicDepartmentFromDB = async (id: string) => {
+  const result = await AcademicDepartment.findById(id);
   return result;
 };
 
-const updateAcademicFacultyInDB = async (
+const updateAcademicDepartmentInDB = async (
   id: string,
-  payload: Partial<TAcademicFaculty>
+  payload: Partial<TAcademicDepartment>
 ) => {
-  const result = await AcademicFaculty.findByIdAndUpdate(id, payload, {
-    new: true,
-  });
+  const result = await AcademicDepartment.findOneAndUpdate(
+    { _id: id },
+    payload,
+    {
+      new: true,
+    }
+  );
 
   return result;
 };
 
 export {
-  createAcademicFacultyIntoDB,
-  getAllAcademicFacultyFromDB,
-  getSingleAcademicFacultyFromDB,
-  updateAcademicFacultyInDB,
+  createAcademicDepartmentIntoDB,
+  getAllAcademicDepartmentFromDB,
+  getSingleAcademicDepartmentFromDB,
+  updateAcademicDepartmentInDB,
 };

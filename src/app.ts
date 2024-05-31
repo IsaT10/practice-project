@@ -5,6 +5,7 @@ import globalErrorHandler from './middleware/globalErrorHandler';
 import httpStatus from 'http-status';
 import router from './routes';
 import { notFoundRoute } from './middleware/notFoundRoute';
+import { error } from 'console';
 const app: Application = express();
 
 app.use(express.json());
