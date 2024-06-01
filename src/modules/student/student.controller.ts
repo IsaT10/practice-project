@@ -3,6 +3,7 @@ import {
   deleteStudentFromDB,
   getAllStudentFromDB,
   getSingleStudentFromDB,
+  updateStudentInDB,
 } from './student.services';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
@@ -48,4 +49,18 @@ const deleteStudent = catchAsync(async (req, res) => {
   });
 });
 
-export { getStudents, getSingleStudent, deleteStudent };
+const updateStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
+
+  const { student } = req.body;
+  const result = await updateStudentInDB(studentId, student);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: result,
+    success: true,
+    message: 'Student is updated successfully',
+  });
+});
+
+export { getStudents, getSingleStudent, deleteStudent, updateStudent };

@@ -1,3 +1,5 @@
+import httpStatus from 'http-status';
+import AppError from '../../utils/appError';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { getSingleAcademicSemesterFromDB } from '../academicSemester/academicSemester.services';
 import { TStudent } from '../student/student.interface';
@@ -5,6 +7,7 @@ import { Student } from '../student/student.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
 import { generateStudentId } from './user.utils';
+import mongoose from 'mongoose';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   const user: Partial<TUser> = {};
@@ -18,20 +21,40 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   );
 
   if (!admissionSemester) {
-    throw new Error('Academic Semester not found');
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic Semester not found');
   }
 
-  //set  generated id
-  user.id = await generateStudentId(admissionSemester);
+  const session = await mongoose.startSession();
 
-  const newUser = await User.create(user);
+  try {
+    session.startTransaction();
+    //set  generated id
+    user.id = await generateStudentId(admissionSemester);
 
-  if (Object.keys(newUser).length) {
-    payload.id = newUser.id;
-    payload.user = newUser._id;
+    // create a user (transaction-1)
+    const newUser = await User.create([user], { session });
 
-    const newStudent = await Student.create(payload);
+    if (!newUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user!');
+    }
+
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    // create a student (transaction-2)
+    const newStudent = await Student.create([payload], { session });
+
+    if (!newStudent.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student!');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
     return newStudent;
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
   }
 
   //  statics methods

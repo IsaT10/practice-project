@@ -162,7 +162,7 @@ const StudentSchema = new Schema<TStudent, StudentModel>({
     ref: 'AcademicDepartment',
   },
 
-  isDelete: {
+  isDeleted: {
     type: Boolean,
     default: false,
   },
