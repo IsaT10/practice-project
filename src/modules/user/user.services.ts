@@ -1,6 +1,5 @@
 import httpStatus from 'http-status';
 import AppError from '../../utils/appError';
-import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { getSingleAcademicSemesterFromDB } from '../academicSemester/academicSemester.services';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
