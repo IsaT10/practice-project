@@ -16,6 +16,10 @@ app.get('/', (req: Request, res: Response) => {
   res.status(200).json({ message: 'Server is running' });
 });
 
+app.get('/test', (req: Request, res: Response) => {
+  res.status(200).json({ message: 'testing...' });
+});
+
 // api routes
 app.use('/api/v1', router);
 

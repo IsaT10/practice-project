@@ -1,5 +1,4 @@
 import httpStatus from 'http-status';
-import AppError from '../../utils/appError';
 import { getSingleAcademicSemesterFromDB } from '../academicSemester/academicSemester.services';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
@@ -7,6 +6,7 @@ import { TUser } from './user.interface';
 import { User } from './user.model';
 import { generateStudentId } from './user.utils';
 import mongoose from 'mongoose';
+import AppError from '../../utils/appError';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   const user: Partial<TUser> = {};

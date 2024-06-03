@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import { Student } from './student.model';
-import AppError from '../../utils/appError';
 import httpStatus from 'http-status';
 import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
+import AppError from '../../utils/appError';
 
 const getAllStudentFromDB = async () => {
   const result = await Student.find()
