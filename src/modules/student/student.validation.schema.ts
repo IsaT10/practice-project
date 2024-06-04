@@ -1,17 +1,20 @@
 import { z } from 'zod';
 
-const UserNameValidationSchema = z.object({
-  firstName: z
-    .string()
-    .trim()
-    .min(1, { message: 'First name is required.' })
-    .regex(
-      /^[A-Z][a-z]*$/,
-      'First name must start with a capital letter followed by lowercase letters.'
-    ),
-  middleName: z.string().trim().optional(),
-  lastName: z.string().trim().min(1, 'Last name is required.'),
-});
+const UserNameValidationSchema = z.object(
+  {
+    firstName: z
+      .string()
+      .trim()
+      .min(1, { message: 'First name is required.' })
+      .regex(
+        /^[A-Z][a-z]*$/,
+        'First name must start with a capital letter followed by lowercase letters.'
+      ),
+    middleName: z.string().trim().optional(),
+    lastName: z.string().trim().min(1, 'Last name is required.'),
+  },
+  { required_error: 'Name is required' }
+);
 
 const GuardianValidationSchema = z.object({
   fatherName: z.string().min(1, "Father's name is required."),

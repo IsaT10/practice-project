@@ -3,15 +3,72 @@ import { Student } from './student.model';
 import httpStatus from 'http-status';
 import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
-import AppError from '../../utils/appError';
+import AppError from '../../errors/appError';
+import QueryBuilder from '../../builder/QueryBuilder';
 
-const getAllStudentFromDB = async () => {
-  const result = await Student.find()
-    .populate('admissionSemester')
-    .populate({
-      path: 'academicDepartment',
-      populate: { path: 'academicFaculty' },
-    });
+const getAllStudentFromDB = async (query: Record<string, unknown>) => {
+  // const queryObj: Record<string, unknown> = { ...query };
+
+  // const excludeFileds = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+
+  // excludeFileds.forEach((el) => delete queryObj[el]);
+
+  // console.log(query, queryObj);
+
+  // let baseQuery = Student.find(queryObj);
+
+  // if (query.searchTerm) {
+  //   const searchTerm = query.searchTerm;
+  //   const searchQuery = {
+  //     $or: searchFields.map((field) => ({
+  //       [field]: { $regex: searchTerm, $options: 'i' },
+  //     })),
+  //   };
+
+  //   baseQuery = baseQuery.find(searchQuery);
+  // }
+
+  // if (query.sort) {
+  //   baseQuery = baseQuery.sort(query.sort as string);
+  // } else {
+  //   baseQuery = baseQuery.sort('-createdAt');
+  // }
+
+  // if (query.fields) {
+  //   const selectField = (query.fields as string).replace(',', ' ');
+  //   console.log(selectField);
+  //   baseQuery = baseQuery.select(selectField);
+  // } else {
+  //   baseQuery = baseQuery.select('-__v');
+  // }
+
+  // const limit = Number(query.limit) || 10;
+  // const page = Number(query.page) || 1;
+
+  // if (query.limit) {
+  //   const skip = (page - 1) * limit;
+  //   baseQuery = baseQuery.skip(skip).limit(limit);
+  // }
+
+  // const result = await baseQuery;
+  const searchFields = ['email', 'presentAddress', 'name.firstName'];
+
+  const studetQuery = new QueryBuilder(
+    Student.find()
+      .populate('admissionSemester')
+      .populate({
+        path: 'academicDepartment',
+        populate: { path: 'academicFaculty' },
+      }),
+    query
+  )
+    .filter()
+    .search(searchFields)
+    .sort()
+    .pagination()
+    .fields();
+
+  const result = await studetQuery.queryModel;
   return result;
 };
 
@@ -22,6 +79,10 @@ const getSingleStudentFromDB = async (id: string) => {
       path: 'academicDepartment',
       populate: { path: 'academicFaculty' },
     });
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student does not exists');
+  }
   return result;
 };
 

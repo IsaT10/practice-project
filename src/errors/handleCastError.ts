@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import AppError from '../utils/appError';
+import AppError from './appError';
 import mongoose from 'mongoose';
 
 const handleCastError = (err: mongoose.Error.CastError) => {

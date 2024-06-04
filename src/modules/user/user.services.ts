@@ -6,7 +6,9 @@ import { TUser } from './user.interface';
 import { User } from './user.model';
 import { generateStudentId } from './user.utils';
 import mongoose from 'mongoose';
-import AppError from '../../utils/appError';
+import AppError from '../../errors/appError';
+import handleDuplicateError from '../../errors/handleDuplicateError';
+import handleValidationError from '../../errors/handleValidationError';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   const user: Partial<TUser> = {};
@@ -51,9 +53,22 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     await session.endSession();
 
     return newStudent;
-  } catch (error) {
+  } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
+
+    console.log(error);
+
+    if (error?.name === 'ValidationError') {
+      throw handleValidationError(error);
+    }
+
+    if (error.code === 11000) {
+      throw handleDuplicateError(error);
+    }
+
+    // Handle any other types of errors
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, error.message);
   }
 
   //  statics methods

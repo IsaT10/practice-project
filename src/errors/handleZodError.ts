@@ -1,5 +1,5 @@
 import { ZodError, ZodIssue } from 'zod';
-import AppError from '../utils/appError';
+import AppError from './appError';
 import httpStatus from 'http-status';
 
 const handelZodError = (err: ZodError) => {

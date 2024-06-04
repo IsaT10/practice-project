@@ -1,11 +1,10 @@
 import httpStatus from 'http-status';
-import AppError from '../utils/appError';
+import AppError from './appError';
 
 const handleDuplicateError = (err: any) => {
   const values = Object.values(err.keyValue);
-  const message = `Duplicate field value "${values.join(
-    ' '
-  )}". Use another value!`;
+  console.log(values);
+  const message = `'${values.join(' ')}' is already exists. Use another value!`;
 
   return new AppError(httpStatus.BAD_REQUEST, message);
 };

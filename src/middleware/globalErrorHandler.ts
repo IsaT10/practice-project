@@ -5,7 +5,7 @@ import handelZodError from '../errors/handleZodError';
 import handleValidationError from '../errors/handleValidationError';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
-import AppError from '../utils/appError';
+import AppError from '../errors/appError';
 import handleDuplicateError from '../errors/handleDuplicateError';
 import handleCastError from '../errors/handleCastError';
 
