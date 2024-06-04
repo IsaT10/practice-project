@@ -1,4 +1,4 @@
-import { createStudentIntoDB } from './user.services';
+import { createFacultyIntoDB, createStudentIntoDB } from './user.services';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
@@ -16,4 +16,17 @@ const createStudent = catchAsync(async (req, res) => {
   });
 });
 
-export { createStudent };
+const createFaculty = catchAsync(async (req, res) => {
+  const { password, faculty: facultyData } = req.body;
+
+  const newFaculty = await createFacultyIntoDB(password, facultyData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: newFaculty,
+    success: true,
+    message: 'Faculty is created successfully',
+  });
+});
+
+export { createStudent, createFaculty };

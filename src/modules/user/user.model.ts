@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
-import { TUser } from './user.interface';
+import { TUser, UserMethods, UserModel } from './user.interface';
 import bcrypt from 'bcrypt';
 
-const userSchema = new Schema<TUser>(
+const userSchema = new Schema<TUser, UserModel, UserMethods>(
   {
     id: {
       type: String,
@@ -50,4 +50,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-export const User = model<TUser>('User', userSchema);
+// for instance methods
+
+userSchema.methods.isUserExists = async function (id: string) {
+  const result = await User.findOne({ id });
+  return result;
+};
+
+export const User = model<TUser, UserModel>('User', userSchema);

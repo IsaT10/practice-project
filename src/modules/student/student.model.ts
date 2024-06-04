@@ -189,10 +189,10 @@ StudentSchema.statics.isUserExists = async function (id: string) {
 
 // for instance methods
 
-// StudentSchema.methods.isUserExists = async function (id: string) {
-//   const result = await Student.findOne({ id });
-//   return result;
-// };
+StudentSchema.methods.isUserExists = async function (id: string) {
+  const result = await Student.findOne({ id });
+  return result;
+};
 
 StudentSchema.pre('find', async function (next) {
   this.find({ isDelete: { $ne: true } });
