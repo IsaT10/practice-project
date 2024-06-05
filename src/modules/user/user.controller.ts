@@ -1,4 +1,8 @@
-import { createFacultyIntoDB, createStudentIntoDB } from './user.services';
+import {
+  createAdminIntoDB,
+  createFacultyIntoDB,
+  createStudentIntoDB,
+} from './user.services';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
@@ -29,4 +33,17 @@ const createFaculty = catchAsync(async (req, res) => {
   });
 });
 
-export { createStudent, createFaculty };
+const createAdmin = catchAsync(async (req, res) => {
+  const { password, admin: adminData } = req.body;
+
+  const newAdmin = await createAdminIntoDB(password, adminData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: newAdmin,
+    success: true,
+    message: 'Admin is created successfully',
+  });
+});
+
+export { createStudent, createFaculty, createAdmin };

@@ -195,7 +195,7 @@ StudentSchema.methods.isUserExists = async function (id: string) {
 };
 
 StudentSchema.pre('find', async function (next) {
-  this.find({ isDelete: { $ne: true } });
+  this.find({ isDeleted: { $ne: true } });
 
   next();
 });

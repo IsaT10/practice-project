@@ -41,7 +41,7 @@ const getSingleFacultyFromDB = async (id: string) => {
 const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
   const isValidUser = await User.findOne({ id });
   if (!isValidUser) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User does not exists');
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty does not exists');
   }
 
   const { name, ...remainingFacultyFields } = payload;

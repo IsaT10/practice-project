@@ -4,13 +4,19 @@ import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
-import { generateFacultyId, generateStudentId } from './user.utils';
+import {
+  generateAdminId,
+  generateFacultyId,
+  generateStudentId,
+} from './user.utils';
 import mongoose from 'mongoose';
 import AppError from '../../errors/appError';
 import handleDuplicateError from '../../errors/handleDuplicateError';
 import handleValidationError from '../../errors/handleValidationError';
 import { Faculty } from '../faculty/faculty.model';
 import { TFaculty } from '../faculty/faculty.interface';
+import { TAdmin } from '../admin/admin.interface';
+import { Admin } from '../admin/admin.model';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   const user: Partial<TUser> = {};
@@ -140,7 +146,54 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
-export { createStudentIntoDB, createFacultyIntoDB };
+const createAdminIntoDB = async (password: string, payload: TAdmin) => {
+  const user: Partial<TUser> = {};
+
+  user.password = password || process.env.DEFAULT_PASSWORD;
+  user.role = 'admin';
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    //set  generated id
+    user.id = await generateAdminId();
+
+    const newUser = await User.create([user], { session });
+
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    const newAdmin = await Admin.create([payload], { session });
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return newAdmin;
+  } catch (error: any) {
+    await session.abortTransaction();
+    await session.endSession();
+
+    console.log(error);
+
+    if (error?.name === 'ValidationError') {
+      throw handleValidationError(error);
+    }
+
+    if (error?.code === 11000) {
+      throw handleDuplicateError(error);
+    }
+
+    // Handle any other types of errors
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Failed to create admin!'
+    );
+  }
+};
+
+export { createStudentIntoDB, createFacultyIntoDB, createAdminIntoDB };
 
 //  statics methods
 //   if (await Student.isUserExists(student.id)) {
