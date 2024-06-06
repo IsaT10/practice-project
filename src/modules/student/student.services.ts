@@ -124,13 +124,12 @@ const updateStudentInDB = async (id: string, payload: Partial<TStudent>) => {
 };
 
 const deleteStudentFromDB = async (id: string) => {
-  const session = await mongoose.startSession();
-
   const isValidUser = await User.findOne({ id });
   if (!isValidUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'User daoes not exists');
   }
 
+  const session = await mongoose.startSession();
   try {
     session.startTransaction();
 
@@ -161,6 +160,11 @@ const deleteStudentFromDB = async (id: string) => {
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Failed to delete admin!'
+    );
   }
 };
 

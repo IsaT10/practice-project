@@ -11,6 +11,7 @@ import handleCastError from '../errors/handleCastError';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
+
   let error = { ...err };
   error.message = err.message;
 
