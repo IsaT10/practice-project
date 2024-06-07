@@ -11,10 +11,10 @@ import { UpdateFacultyValidationSchema } from './faculty.validation.schema';
 const router = express.Router();
 
 router.get('/', getFaculties);
-router.get('/:facultyId', getSingleFaculty);
-router.delete('/:facultyId', deleteFaculty);
+router.get('/:id', getSingleFaculty);
+router.delete('/:id', deleteFaculty);
 router.patch(
-  '/:facultyId',
+  '/:id',
   validateRequest(UpdateFacultyValidationSchema),
 
   updateFaculty

@@ -27,7 +27,7 @@ const getAllFacultyFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleFacultyFromDB = async (id: string) => {
-  const result = await Faculty.findOne({ id }).populate({
+  const result = await Faculty.findById(id).populate({
     path: 'academicDepartment',
     populate: { path: 'academicFaculty' },
   });
@@ -39,7 +39,7 @@ const getSingleFacultyFromDB = async (id: string) => {
 };
 
 const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
-  const isValidUser = await User.findOne({ id });
+  const isValidUser = await Faculty.findById(id);
   if (!isValidUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'Faculty does not exists');
   }
@@ -56,7 +56,7 @@ const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
     }
   }
 
-  const result = await Faculty.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Faculty.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
@@ -66,16 +66,15 @@ const updateFacultyInDB = async (id: string, payload: Partial<TFaculty>) => {
 const deleteFacultyFromDB = async (id: string) => {
   const session = await mongoose.startSession();
 
-  const isValidUser = await User.findOne({ id });
-  if (!isValidUser) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User daoes not exists');
+  const isValidFaculty = await Faculty.findById(id);
+  if (!isValidFaculty) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty does not exists');
   }
-
   try {
     session.startTransaction();
 
-    const deleteFaculty = await Faculty.findOneAndUpdate(
-      { id },
+    const deleteFaculty = await Faculty.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session }
     );
@@ -84,8 +83,17 @@ const deleteFacultyFromDB = async (id: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete faculty!');
     }
 
-    const deleteUser = await User.findOneAndUpdate(
-      { id },
+    const userId = deleteFaculty.user;
+
+    console.log(userId);
+
+    const isValidUser = await User.findById(userId);
+    if (!isValidUser) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User does not exists');
+    }
+
+    const deleteUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session }
     );

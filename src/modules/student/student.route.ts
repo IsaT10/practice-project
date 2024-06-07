@@ -9,8 +9,8 @@ import {
 const router = express.Router();
 
 router.get('/', getStudents);
-router.get('/:studentId', getSingleStudent);
-router.delete('/:studentId', deleteStudent);
-router.patch('/:studentId', updateStudent);
+router.get('/:id', getSingleStudent);
+router.delete('/:id', deleteStudent);
+router.patch('/:id', updateStudent);
 
 export default router;

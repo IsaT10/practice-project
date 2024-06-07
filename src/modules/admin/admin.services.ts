@@ -22,7 +22,7 @@ const getAllAdminFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleAdminFromDB = async (id: string) => {
-  const result = await Admin.findOne({ id });
+  const result = await Admin.findById(id);
 
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, 'Admin does not exists');
@@ -32,8 +32,7 @@ const getSingleAdminFromDB = async (id: string) => {
 };
 
 const updateAdminInDB = async (id: string, payload: Partial<TAdmin>) => {
-  const isValidAdmin = await Admin.findOne({ id });
-
+  const isValidAdmin = await Admin.findById(id);
   if (!isValidAdmin) {
     throw new AppError(httpStatus.NOT_FOUND, 'Admin does not exists');
   }
@@ -50,16 +49,16 @@ const updateAdminInDB = async (id: string, payload: Partial<TAdmin>) => {
     }
   }
 
-  const result = await Admin.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Admin.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
+
   return result;
 };
 
 const deleteAdminFromDB = async (id: string) => {
-  const isValidAdmin = await Admin.findOne({ id });
-
+  const isValidAdmin = await Admin.findById(id);
   if (!isValidAdmin) {
     throw new AppError(httpStatus.NOT_FOUND, 'Admin does not exists');
   }
@@ -69,8 +68,8 @@ const deleteAdminFromDB = async (id: string) => {
   try {
     session.startTransaction();
 
-    const deleteAdmin = await Admin.findOneAndUpdate(
-      { id },
+    const deleteAdmin = await Admin.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session }
     );
@@ -79,8 +78,10 @@ const deleteAdminFromDB = async (id: string) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Admin!');
     }
 
-    const deleteUser = await User.findOneAndUpdate(
-      { id },
+    const userId = deleteAdmin.user;
+
+    const deleteUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session }
     );
@@ -91,6 +92,8 @@ const deleteAdminFromDB = async (id: string) => {
 
     await session.commitTransaction();
     await session.endSession();
+
+    return deleteAdmin;
   } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
