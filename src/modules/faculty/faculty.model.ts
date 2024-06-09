@@ -32,6 +32,10 @@ const FacultySchema = new Schema<TFaculty>(
       required: [true, 'ID is required'],
       unique: true,
     },
+    designation: {
+      type: String,
+      required: [true, 'Designation is required'],
+    },
     name: {
       type: UserNameSchema,
       required: [true, 'Name is required'],

@@ -38,6 +38,7 @@ const CreateFacultyValidationSchema = z.object({
     password: z.string().min(8, 'Password can not be less than 8 character'),
     faculty: z.object({
       name: UserNameValidationSchema,
+      designation: z.string(),
       gender: z.enum(['male', 'female', 'other'], {
         errorMap: () => ({
           message:

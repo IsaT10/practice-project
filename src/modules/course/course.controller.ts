@@ -2,10 +2,12 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import {
+  assignFacultiesIntoDB,
   createCourseIntoDB,
   deleteCourseFromDB,
   getAllCourseFromDB,
   getSingleCourseFromDB,
+  removeFacultiesFromDB,
   updateCourseIntoDB,
 } from './course.service';
 
@@ -67,10 +69,40 @@ const updateCourse = catchAsync(async (req, res) => {
   });
 });
 
+const assignFaculties = catchAsync(async (req, res) => {
+  const { courseId } = req.params;
+  const { faculties } = req.body;
+
+  const result = await assignFacultiesIntoDB(courseId, faculties);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: result,
+    success: true,
+    message: 'Assign faculties  successfully',
+  });
+});
+
+const removeFaculties = catchAsync(async (req, res) => {
+  const { courseId } = req.params;
+  const { faculties } = req.body;
+
+  const result = await removeFacultiesFromDB(courseId, faculties);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: result,
+    success: true,
+    message: 'Remove faculties  successfully',
+  });
+});
+
 export {
   getCourses,
   getSingleCourse,
   deleteCourse,
   createCourse,
   updateCourse,
+  assignFaculties,
+  removeFaculties,
 };
