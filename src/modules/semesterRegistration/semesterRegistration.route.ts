@@ -3,6 +3,7 @@ import express from 'express';
 import validateRequest from '../../middleware/validateRequest';
 import {
   createSemesterRegistration,
+  deleteSemesterRegistration,
   getSemesterRegistrations,
   getSingleSemesterRegistration,
   updateSemesterRegistration,
@@ -11,7 +12,6 @@ import {
   CreateSemesterRegistrationValidationSchema,
   UpddateSemesterRegistrationValidationSchema,
 } from './semesterRegistration.validation.schema';
-import { UpdateAcademicSemesterSchemaValidation } from '../academicSemester/academicSemester.validation';
 
 const router = express.Router();
 
@@ -22,11 +22,12 @@ router.post(
   createSemesterRegistration
 );
 router.get('/:id', getSingleSemesterRegistration);
-// router.delete('/:id', deleteFaculty);
 router.patch(
   '/:id',
   validateRequest(UpddateSemesterRegistrationValidationSchema),
   updateSemesterRegistration
 );
+
+router.delete('/:id', deleteSemesterRegistration);
 
 export default router;

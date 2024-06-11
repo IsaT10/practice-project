@@ -4,6 +4,8 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { TSemesterRegistration } from './semesterRegistration.interface';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { SemesterRegistration } from './semesterRegistration.model';
+import mongoose from 'mongoose';
+import { OfferedCourse } from '../offeredCourse/offeredCourse.model';
 
 const getAllSemesterRegistrationFromDB = async (
   query: Record<string, unknown>
@@ -122,9 +124,51 @@ const updateSemesterRegistrationInDB = async (
   return result;
 };
 
+const deleteSemesterRegistrationFromDB = async (id: string) => {
+  const isSemesterRegistrationExists = await SemesterRegistration.findById(id);
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Semester registration not found!'
+    );
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+    const deleteOfferedCourseFromSemester = await OfferedCourse.deleteMany({
+      semesterRegistration: id,
+    });
+
+    if (!deleteOfferedCourseFromSemester) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Can not delete releted offered course!'
+      );
+    }
+
+    const result = await SemesterRegistration.findByIdAndDelete(id);
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Failed to delete semester registration!'
+    );
+  }
+};
+
 export {
   getAllSemesterRegistrationFromDB,
   getSingleSemesterRegistrationFromDB,
   updateSemesterRegistrationInDB,
   createSemesterRegistrationIntoDB,
+  deleteSemesterRegistrationFromDB,
 };
