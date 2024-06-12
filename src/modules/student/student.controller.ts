@@ -15,6 +15,8 @@ const catchAsync = (fn: RequestHandler) => {
 };
 
 const getStudents = catchAsync(async (req, res) => {
+  console.log(req.cookies);
+
   const students = await getAllStudentFromDB(req.query);
 
   sendResponse(res, {

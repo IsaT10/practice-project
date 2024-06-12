@@ -28,7 +28,7 @@ class QueryBuilder<T> {
   }
 
   filter() {
-    const queryObj: Record<string, unknown> = { ...this.query };
+    const queryObj = { ...this.query };
     const excludeFileds: string[] = [
       'searchTerm',
       'sort',
@@ -39,7 +39,7 @@ class QueryBuilder<T> {
 
     excludeFileds.forEach((el) => delete queryObj[el]);
 
-    this.queryModel = this.queryModel.find(queryObj);
+    this.queryModel = this.queryModel.find(queryObj as FilterQuery<T>);
 
     return this;
   }

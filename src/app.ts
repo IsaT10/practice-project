@@ -1,14 +1,13 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-
+import cookieParser from 'cookie-parser';
 import globalErrorHandler from './middleware/globalErrorHandler';
-import httpStatus from 'http-status';
 import router from './routes';
 import { notFoundRoute } from './middleware/notFoundRoute';
-import { error } from 'console';
 const app: Application = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 
 // initial server start
