@@ -41,8 +41,8 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     user.id = await generateStudentId(admissionSemester);
 
     //  check if user is Exists
-    const userInstance = new User(user);
-    if (await userInstance.isUserExists(user.id)) {
+    const isUserExists = await User.findOne({ id: user.id });
+    if (isUserExists) {
       throw new Error('User already exists');
     }
 
@@ -100,8 +100,13 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     user.id = await generateFacultyId();
 
     //  check if user is Exists
-    const userInstance = new User(user);
-    if (await userInstance.isUserExists(user.id)) {
+    // const userInstance = new User(user);
+    // if (await userInstance.isUserExists(user.id)) {
+    //   throw new Error('User already exists');
+    // }
+
+    const isUserExists = await User.findOne({ id: user.id });
+    if (isUserExists) {
       throw new Error('User already exists');
     }
 

@@ -1,7 +1,6 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
 import {
-  StudentModel,
   TGuardian,
   TLocalGuardian,
   TStudent,
@@ -88,7 +87,7 @@ const LocalGuardianSchema = new Schema<TLocalGuardian>({
   },
 });
 
-const StudentSchema = new Schema<TStudent, StudentModel>(
+const StudentSchema = new Schema<TStudent>(
   {
     id: {
       type: String,
@@ -182,17 +181,17 @@ const StudentSchema = new Schema<TStudent, StudentModel>(
 
 // for static methods
 
-StudentSchema.statics.isUserExists = async function (id: string) {
-  const result = await Student.findOne({ id });
-  return result;
-};
+// StudentSchema.statics.isUserExists = async function (id: string) {
+//   const result = await Student.findOne({ id });
+//   return result;
+// };
 
 // for instance methods
 
-StudentSchema.methods.isUserExists = async function (id: string) {
-  const result = await Student.findOne({ id });
-  return result;
-};
+// StudentSchema.methods.isUserExists = async function (id: string) {
+//   const result = await Student.findOne({ id });
+//   return result;
+// };
 
 StudentSchema.pre('find', async function (next) {
   this.find({ isDeleted: { $ne: true } });
@@ -200,4 +199,4 @@ StudentSchema.pre('find', async function (next) {
   next();
 });
 
-export const Student = model<TStudent, StudentModel>('Student', StudentSchema);
+export const Student = model<TStudent>('Student', StudentSchema);

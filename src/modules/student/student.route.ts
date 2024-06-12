@@ -5,11 +5,12 @@ import {
   getStudents,
   updateStudent,
 } from './student.controller';
+import { auth } from '../../middleware/auth';
 
 const router = express.Router();
 
-router.get('/', getStudents);
-router.get('/:id', getSingleStudent);
+router.get('/', auth('admin', 'student'), getStudents);
+router.get('/:id', auth('admin', 'student'), getSingleStudent);
 router.delete('/:id', deleteStudent);
 router.patch('/:id', updateStudent);
 
