@@ -9,6 +9,9 @@ const validateRequest = (schema: AnyZodObject) => {
       cookies: req.cookies,
     });
 
+    // console.log(parseBody);
+    // req.body = parseBody.body;
+
     next();
   });
 };

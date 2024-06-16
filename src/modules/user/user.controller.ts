@@ -1,7 +1,9 @@
 import {
+  changeUserStatus,
   createAdminIntoDB,
   createFacultyIntoDB,
   createStudentIntoDB,
+  getMeFromDB,
 } from './user.services';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
@@ -10,7 +12,7 @@ import catchAsync from '../../utils/catchAsync';
 const createStudent = catchAsync(async (req, res) => {
   const { password, student: studentData } = req.body;
 
-  const newStudent = await createStudentIntoDB(password, studentData);
+  const newStudent = await createStudentIntoDB(req.file, password, studentData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -46,4 +48,31 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
-export { createStudent, createFaculty, createAdmin };
+const getMe = catchAsync(async (req, res) => {
+  const { userId, role } = req.user;
+
+  const newAdmin = await getMeFromDB(userId, role);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: newAdmin,
+    success: true,
+    message: 'Profile retrived successfully',
+  });
+});
+
+const changeStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const newAdmin = await changeUserStatus(id, status);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: newAdmin,
+    success: true,
+    message: 'Status changed successfully',
+  });
+});
+
+export { createStudent, createFaculty, createAdmin, getMe, changeStatus };

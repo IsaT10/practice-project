@@ -5,6 +5,8 @@ import { TAuth } from './auth.interface';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { createToken } from './authutils';
+import { sendEmail } from '../../utils/sendEmail';
+import { decodedToken } from '../../utils/decodedToken';
 
 const loginUserDB = async (payload: TAuth) => {
   const validUser = await User.isValidUser(payload?.id);
@@ -68,8 +70,6 @@ const changeUserPassword = async (
     Number(process.env.SALT_ROUNDS)
   );
 
-  console.log(newHashPassword);
-
   await User.findOneAndUpdate(
     { id: userId, role },
     {
@@ -114,4 +114,56 @@ const refreshTokenFromServer = async (token: string) => {
   return { accessToken };
 };
 
-export { loginUserDB, changeUserPassword, refreshTokenFromServer };
+const forgetPasswordInDB = async (userId: string) => {
+  // check is valid user
+  const user = await User.isValidUser(userId);
+
+  const jwtPayload = { userId: user.id, role: user.role };
+
+  const resetToken = createToken(
+    jwtPayload,
+    process.env.JWT_ACCESS_SECRET as string,
+    '10m'
+  );
+
+  const resetLink = `${process.env.RESET_PASSWORD_UI_LINK}?id=${user.id}&token=${resetToken}`;
+
+  // sendEmail(user.email, resetLink);
+  console.log(resetLink);
+};
+
+const resetPasswordInDB = async (
+  payload: { id: string; newPassword: string },
+  token: string
+) => {
+  // check is valid user
+  const user = await User.isValidUser(payload.id);
+
+  const decoded = decodedToken(token, process.env.JWT_ACCESS_SECRET as string);
+
+  if (decoded.userId !== user.id) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are forbidden');
+  }
+
+  const newHashPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(process.env.SALT_ROUNDS)
+  );
+
+  await User.findOneAndUpdate(
+    { id: decoded.userId, role: decoded.role },
+    {
+      password: newHashPassword,
+      needsPasswordChange: false,
+      passwordChangeAt: new Date(),
+    }
+  );
+};
+
+export {
+  loginUserDB,
+  changeUserPassword,
+  refreshTokenFromServer,
+  forgetPasswordInDB,
+  resetPasswordInDB,
+};
