@@ -30,6 +30,7 @@ router.patch(
   updateCourse
 );
 router.delete('/:id', deleteCourse);
+
 router.put(
   '/:courseId/assign-faculties',
   validateRequest(CourseFacultyValidationSchema),

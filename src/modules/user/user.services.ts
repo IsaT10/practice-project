@@ -17,12 +17,18 @@ import { Faculty } from '../faculty/faculty.model';
 import { TFaculty } from '../faculty/faculty.interface';
 import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const createStudentIntoDB = async (
+  file: any,
+  password: string,
+  payload: TStudent
+) => {
   const user: Partial<TUser> = {};
 
   user.password = password || (process.env.DEFAULT_PASSWORD as string);
   user.role = 'student';
+  user.email = payload.email;
 
   // find academic semester info
   const admissionSemester = await getSingleAcademicSemesterFromDB(
@@ -44,6 +50,15 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     const isUserExists = await User.findOne({ id: user.id });
     if (isUserExists) {
       throw new Error('User already exists');
+    }
+
+    const path = file?.path;
+    const imgName = `${user.id}-${payload?.name?.firstName}`;
+
+    //send image to cloudinary
+    const data = await sendImageToCloudinary(path, imgName);
+    if (data) {
+      payload.profileImg = data.secure_url;
     }
 
     // create a user (transaction-1)
@@ -91,6 +106,7 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
   user.password = password || (process.env.DEFAULT_PASSWORD as string);
   user.role = 'faculty';
+  user.email = payload.email;
 
   const session = await mongoose.startSession();
 
@@ -156,6 +172,7 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
 
   user.password = password || process.env.DEFAULT_PASSWORD;
   user.role = 'admin';
+  user.email = payload.email;
 
   const session = await mongoose.startSession();
 
@@ -198,7 +215,37 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   }
 };
 
-export { createStudentIntoDB, createFacultyIntoDB, createAdminIntoDB };
+const getMeFromDB = async (id: string, role: string) => {
+  let result;
+
+  if (role === 'student') {
+    result = await Student.findOne({ id }).populate('user');
+  }
+  if (role === 'admin') {
+    result = await Admin.findOne({ id }).populate('user');
+  }
+  if (role === 'faculty') {
+    result = await Faculty.findOne({ id }).populate('user');
+  }
+
+  return result;
+};
+
+const changeUserStatus = async (id: string, status: string) => {
+  const result = await User.findByIdAndUpdate(id, { status }, { new: true });
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  return result;
+};
+
+export {
+  createStudentIntoDB,
+  createFacultyIntoDB,
+  createAdminIntoDB,
+  getMeFromDB,
+  changeUserStatus,
+};
 
 //  statics methods
 //   if (await Student.isUserExists(student.id)) {

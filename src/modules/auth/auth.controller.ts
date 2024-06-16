@@ -3,8 +3,10 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import {
   changeUserPassword,
+  forgetPasswordInDB,
   loginUserDB,
   refreshTokenFromServer,
+  resetPasswordInDB,
 } from './auth.service';
 
 const loginUser = catchAsync(async (req, res) => {
@@ -49,4 +51,34 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 
-export { loginUser, changePassword, refreshToken };
+const forgetPassword = catchAsync(async (req, res) => {
+  const userId = req.body.id;
+  const data = await forgetPasswordInDB(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: data,
+    success: true,
+    message: 'Generate a link successfully',
+  });
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+  const token = req.headers?.authorization?.split(' ')[1];
+  const data = await resetPasswordInDB(req.body, token!);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    data: data,
+    success: true,
+    message: 'Generate a link successfully',
+  });
+});
+
+export {
+  loginUser,
+  changePassword,
+  refreshToken,
+  forgetPassword,
+  resetPassword,
+};
