@@ -128,8 +128,8 @@ const forgetPasswordInDB = async (userId: string) => {
 
   const resetLink = `${process.env.RESET_PASSWORD_UI_LINK}?id=${user.id}&token=${resetToken}`;
 
-  // sendEmail(user.email, resetLink);
-  console.log(resetLink);
+  sendEmail(user.email, resetLink);
+  // console.log(resetLink);
 };
 
 const resetPasswordInDB = async (
