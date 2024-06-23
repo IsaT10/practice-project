@@ -101,7 +101,11 @@ const createStudentIntoDB = async (
   }
 };
 
-const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+const createFacultyIntoDB = async (
+  file: any,
+  password: string,
+  payload: TFaculty
+) => {
   const user: Partial<TUser> = {};
 
   user.password = password || (process.env.DEFAULT_PASSWORD as string);
@@ -124,6 +128,15 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     const isUserExists = await User.findOne({ id: user.id });
     if (isUserExists) {
       throw new Error('User already exists');
+    }
+
+    const path = file?.path;
+    const imgName = `${user.id}-${payload?.name?.firstName}`;
+
+    //send image to cloudinary
+    const data = await sendImageToCloudinary(path, imgName);
+    if (data) {
+      payload.profileImg = data.secure_url;
     }
 
     // create a user (transaction-1)

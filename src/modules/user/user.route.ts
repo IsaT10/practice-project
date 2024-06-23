@@ -34,9 +34,22 @@ router.post(
 router.post(
   '/create-faculty',
   auth('admin'),
+  upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   validateRequest(CreateFacultyValidationSchema),
+
   createFaculty
 );
+
+// router.post(
+//   '/create-faculty',
+//   auth('admin'),
+//   validateRequest(CreateFacultyValidationSchema),
+//   createFaculty
+// );
 
 router.post(
   '/create-admin',
